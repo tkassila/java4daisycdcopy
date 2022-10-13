@@ -56,6 +56,10 @@ public class MakeSound {
       //  if (isPlaying) {
         if(mp != null && mp.getStatus() == MediaPlayer.Status.PLAYING)
             mp.stop();
+            try {
+                Thread.sleep(500);
+            } catch (Exception e){
+            }
       //  }
         mp = null;
         isPlaying = false;
