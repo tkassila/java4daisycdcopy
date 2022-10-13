@@ -6,6 +6,7 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.AccessibleRole;
 import javafx.scene.control.*;
+import javafx.scene.layout.GridPane;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 
@@ -15,7 +16,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
-import java.util.Scanner;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -169,7 +170,55 @@ public class Java4DaisyCdCopyController {
         {
             String strCreator = "";
             String strTitle = "kirja1";
-            copyDirContent(readDir, writeDir, strTitle, strCreator, false);
+            try {
+                Dialog<ButtonType> dialog = new Dialog<>();
+                dialog.setTitle("Directory name");
+                dialog.setHeaderText("You should set a name of created new directory. \n" +
+                        "Press Ok or Cancel button after written dir name.");
+                dialog.setResizable(true);
+
+                Label label1 = new Label("Dir Name: ");
+                TextField text1 = new TextField();
+                GridPane grid = new GridPane();
+                grid.add(label1, 1, 1);
+                grid.add(text1, 2, 1);
+                dialog.getDialogPane().setContent(grid);
+                ButtonType buttonTypeOk = ButtonType.OK;
+                ButtonType buttonTypeCancel = ButtonType.CANCEL;
+                dialog.getDialogPane().getButtonTypes().add(buttonTypeOk);
+                dialog.getDialogPane().getButtonTypes().add(buttonTypeCancel);
+                Optional<ButtonType> result = dialog.showAndWait();
+                if (result.isPresent() && result.get() == ButtonType.OK) {
+                    strTitle = text1.getText();
+                }
+                else
+                    strTitle = "Book1";
+                File fTest = new File(writeDir.getAbsolutePath() +File.separatorChar +strTitle);
+                if (fTest.exists())
+                {
+                    dialog.setHeaderText("Directory " +text1.getText() +" exists all ready.\n" +
+                            "Give an another directory name.\n" +
+                            "Press Ok or Cancel button after written dir name.");
+                    result = dialog.showAndWait();
+                    if (result.isPresent() && result.get() == ButtonType.OK) {
+                        strTitle = text1.getText();
+                    }
+                    else {
+                        setLabelMsg("No copy.");
+                        return;
+                    }
+                    fTest = new File(writeDir.getAbsolutePath() +File.separatorChar +strTitle);
+                    if (fTest.exists())
+                    {
+                        setLabelMsg("No copy. This directory exists all ready: " +fTest.getAbsolutePath());
+                        return;
+                    }
+                }
+                copyDirContent(readDir, writeDir, strTitle, strCreator, false);
+            } catch (Exception e) {
+                e.printStackTrace();
+                setLabelMsg("Error: " +e.getMessage().toString());
+            }
         }
     }
 
@@ -180,6 +229,7 @@ public class Java4DaisyCdCopyController {
         String strContent = "";
         BufferedReader br = null;
         try {
+            startPlayWaw();
             br = new BufferedReader(new FileReader(nccFile, StandardCharsets.UTF_8));
             String line;
             StringBuffer sb = new StringBuffer();
@@ -229,10 +279,21 @@ public class Java4DaisyCdCopyController {
                 }catch (IOException ioe){
                     ioe.printStackTrace();
                 }
+            stopPlayWaw();
         }
     }
 
+    private void startPlayWaw()
+    {
+
+    }
+
+    private void stopPlayWaw()
+    {
+
+    }
     private void copyDirContent(File readDir, File writeDir, String strTitle, String strCreator, boolean isDaisyCoopy)
+            throws Exception
     {
         if (readDir == null || !readDir.exists())
         {
@@ -242,13 +303,19 @@ public class Java4DaisyCdCopyController {
         {
             return;
         }
+        String strDirName = new String("");
         if (strTitle == null || strTitle.trim().length()==0)
             return;
-        if (strCreator == null || strCreator.trim().length()==0)
+        strDirName = "" +strTitle;
+        if (strCreator == null)
             return;
+        else {
+            if (strCreator.trim().length() > 0)
+                strDirName = strCreator + ", " + strTitle;
+        }
 
         File writeNewDir = new File(writeDir.getAbsolutePath()
-                +File.separatorChar +strCreator +"," +strTitle);
+                +File.separatorChar +strDirName);
         if (writeNewDir.exists())
         {
             String strAfile = "Directory";
@@ -281,7 +348,7 @@ public class Java4DaisyCdCopyController {
         }catch (Exception e){
             e.printStackTrace();
             setLabelMsg("Error in the directory writing: " +e.getMessage());
-            return;
+            throw e;
         }
     }
 

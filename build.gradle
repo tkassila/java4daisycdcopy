@@ -25,12 +25,23 @@ tasks.withType(JavaCompile) {
 
 application {
     mainModule = 'com.metait.java4daisycdcopy'
-    mainClass = 'com.metait.java4daisycdcopy.HelloApplication'
+    mainClass = 'com.metait.java4daisycdcopy.Java4DaisyCdCopyApplication'
 }
 
 javafx {
     version = '17.0.2'
     modules = ['javafx.controls', 'javafx.fxml']
+}
+
+task fatJar(type: Jar) {
+    manifest {
+        attributes 'Implementation-Title': 'Gradle Jar File Example',
+                'Implementation-Version': version,
+                'Main-Class': application.mainClass
+    }
+    baseName = project.name + '-all'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
 }
 
 dependencies {

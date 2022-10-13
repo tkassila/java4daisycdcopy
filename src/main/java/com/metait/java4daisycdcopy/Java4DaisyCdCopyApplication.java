@@ -13,7 +13,8 @@ public class Java4DaisyCdCopyApplication extends Application {
     @Override
     public void start(Stage stage) throws IOException {
 
-        FXMLLoader fxmlLoader = new FXMLLoader(Java4DaisyCdCopyApplication.class.getResource("java4daisycdcopy-view.fxml"));
+        // getClass().getResource(
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("java4daisycdcopy-view.fxml"));
         controller = new Java4DaisyCdCopyController();
         try {
             Parent loadedroot = fxmlLoader.load();
