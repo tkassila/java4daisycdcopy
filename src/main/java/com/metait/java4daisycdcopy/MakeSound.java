@@ -18,8 +18,6 @@ public class MakeSound {
     }
 
     public boolean stop() {
-        if (!isPlaying)
-            return false;
         return stopPlaying();
     }
 
@@ -34,9 +32,9 @@ public class MakeSound {
             mediaFile = new File(strFilename);
             String strResource = strFilename; // mediaFile.toURI().toString();
             media = new Media(strResource);
-            MediaPlayer mp = new MediaPlayer(media);
-            mp.setAutoPlay(false);
-            mp.play();
+            mp = new MediaPlayer(media);
+            mp.setAutoPlay(true);
+            // mp.play();
             isPlaying = true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -48,7 +46,7 @@ public class MakeSound {
 
     private boolean startPlaying()
     {
-        if (!isPlaying)
+        if(mp != null && !(mp.getStatus() == MediaPlayer.Status.PLAYING))
             mp.play();
         return isPlaying;
     }
@@ -56,9 +54,11 @@ public class MakeSound {
     private boolean stopPlaying()
     {
       //  if (isPlaying) {
+        if(mp != null && mp.getStatus() == MediaPlayer.Status.PLAYING)
             mp.stop();
-            isPlaying = false;
       //  }
+        mp = null;
+        isPlaying = false;
         return isPlaying;
     }
 }
