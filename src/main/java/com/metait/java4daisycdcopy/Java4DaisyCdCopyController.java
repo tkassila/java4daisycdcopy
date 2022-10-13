@@ -131,6 +131,7 @@ public class Java4DaisyCdCopyController {
     @FXML
     protected void pressedButtonCopy() {
 
+        MakeSound ms = null;
         setLabelMsg("Copy started...");
         if (textFieldReadDir.getText().trim().length()==0)
         {
@@ -258,7 +259,10 @@ public class Java4DaisyCdCopyController {
                         return;
                     }
                 }
+                ms = new MakeSound();
+                ms.playSound(Java4DaisyCdCopyApplication.class.getResource("mistle_w.wav").toString());
                 copyDirContent(readDir, writeDir, strTitle, strCreator, false);
+                ms.stop();
             } catch (Exception e) {
                 e.printStackTrace();
                 setLabelMsg("Error: " +e.getMessage().toString());
@@ -272,6 +276,7 @@ public class Java4DaisyCdCopyController {
         String strCreator = "";
         String strContent = "";
         BufferedReader br = null;
+        MakeSound ms = null;
         try {
             startPlayWaw();
             br = new BufferedReader(new FileReader(nccFile, StandardCharsets.UTF_8));
@@ -307,7 +312,10 @@ public class Java4DaisyCdCopyController {
                                     if (strCreator.trim().length()==0)
                                         strCreator = new String("");
                                     boolean isDaisyCopy = true;
+                                    ms = new MakeSound();
+                                    ms.playSound(Java4DaisyCdCopyApplication.class.getResource("mistle_w.wav").toString());
                                     copyDirContent(readDir, writeDir, strTitle, strCreator, isDaisyCopy);
+                                    ms.stop();
                                 }
                             }
                         }
