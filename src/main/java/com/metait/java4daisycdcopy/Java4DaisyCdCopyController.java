@@ -58,38 +58,38 @@ public class Java4DaisyCdCopyController {
         tooltip.setStyle("-fx-font-weight: bold; -fx-text-fill: yellow; -fx-font-size: 14");
         buttonCopy.setTooltip(tooltip);
         buttonCopy.setAccessibleHelp(tooltip.getText());
-        buttonCopy.setAccessibleText(tooltip.getText());
-        buttonCopy.setAccessibleRoleDescription(buttonCopy.getText());
+        // buttonCopy.setAccessibleText(tooltip.getText());
+        //buttonCopy.setAccessibleRoleDescription(buttonCopy.getText());
 
         tooltip = new Tooltip(
                 "Set a read  directory before a copy");
         tooltip.setStyle("-fx-font-weight: bold; -fx-text-fill: yellow; -fx-font-size: 14");
         buttonReadDir.setTooltip(tooltip);
         buttonReadDir.setAccessibleHelp(tooltip.getText());
-        buttonReadDir.setAccessibleText(tooltip.getText());
+        //buttonReadDir.setAccessibleText(tooltip.getText());
         buttonReadDir.setAccessibleRole(AccessibleRole.BUTTON);
-        buttonReadDir.setAccessibleRoleDescription(buttonReadDir.getText());
+        // buttonReadDir.setAccessibleRoleDescription(buttonReadDir.getText());
 
         tooltip = new Tooltip(
                 "Set a target  directory before a copy");
         tooltip.setStyle("-fx-font-weight: bold; -fx-text-fill: yellow; -fx-font-size: 14");
         buttonWriteDir.setTooltip(tooltip);
         buttonWriteDir.setAccessibleHelp(tooltip.getText());
-        buttonWriteDir.setAccessibleText(tooltip.getText());
+        //buttonWriteDir.setAccessibleText(tooltip.getText());
         buttonWriteDir.setAccessibleRole(AccessibleRole.BUTTON);
-        buttonWriteDir.setAccessibleRoleDescription(buttonWriteDir.getText());
+        // buttonWriteDir.setAccessibleRoleDescription(buttonWriteDir.getText());
 
         buttonReadDir.defaultButtonProperty().bind(buttonReadDir.focusedProperty());
         buttonWriteDir.defaultButtonProperty().bind(buttonWriteDir.focusedProperty());
         buttonCopy.defaultButtonProperty().bind(buttonCopy.focusedProperty());
         buttonCopy.setAccessibleRole(AccessibleRole.BUTTON);
-        buttonCopy.setAccessibleRoleDescription(buttonCopy.getText());
+        // buttonCopy.setAccessibleRoleDescription(buttonCopy.getText());
 
         listView.setItems(listitems);
         labelMsg.setAccessibleText("Message of the application");
         labelMsg.setAccessibleRole(AccessibleRole.TEXT);
         labelMsg.setFocusTraversable(true);
-        labelMsg.setAccessibleRoleDescription(labelMsg.getText());
+        // labelMsg.setAccessibleRoleDescription(labelMsg.getText());
 
         tooltip = new Tooltip(
                 "list for copied files");
@@ -98,7 +98,7 @@ public class Java4DaisyCdCopyController {
         listView.setAccessibleHelp(tooltip.getText());
         listView.setAccessibleText(tooltip.getText());
         listView.setAccessibleRole(AccessibleRole.LIST_VIEW);
-        listView.setAccessibleRoleDescription(tooltip.getText());
+        // listView.setAccessibleRoleDescription(tooltip.getText());
     }
 
     private void setLabelMsg(String msg)
@@ -106,7 +106,7 @@ public class Java4DaisyCdCopyController {
         Platform.runLater(new Runnable() {
             public void run() {
                 labelMsg.setText(msg);
-                labelMsg.setAccessibleText(msg);
+               // labelMsg.setAccessibleText(msg);
                 labelMsg.requestFocus();
             }
         });
