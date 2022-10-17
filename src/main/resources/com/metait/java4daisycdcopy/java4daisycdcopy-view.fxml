@@ -9,7 +9,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="549.0" prefWidth="876.0" spacing="10.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/19" fx:controller="com.metait.java4daisycdcopy.Java4DaisyCdCopyController">
+<VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="549.0" prefWidth="876.0" spacing="10.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.metait.java4daisycdcopy.Java4DaisyCdCopyController">
     <padding>
         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
     </padding>
@@ -44,15 +44,19 @@
                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
             </padding>
             <children>
-               <VBox prefHeight="65.0" prefWidth="80.0">
+               <VBox prefHeight="65.0" prefWidth="80.0" spacing="5.0">
                   <children>
                      <Button fx:id="buttonCopy" minWidth="-Infinity" mnemonicParsing="false" onAction="#pressedButtonCopy" prefHeight="30.0" prefWidth="74.0" text="Copy" />
+                     <Button fx:id="buttonCancel" layoutX="10.0" layoutY="10.0" minWidth="-Infinity" mnemonicParsing="false" onAction="#pressedButtonCancel" prefHeight="30.0" prefWidth="74.0" text="Cancel" />
                      <Label minWidth="-Infinity" prefHeight="30.0" prefWidth="73.0" text="Message:">
                         <padding>
                            <Insets top="5.0" />
                         </padding>
                      </Label>
                   </children>
+                  <HBox.margin>
+                     <Insets top="5.0" />
+                  </HBox.margin>
                </VBox>
                <TextArea fx:id="labelMsg" editable="false" prefHeight="65.0" prefWidth="745.0" wrapText="true" />
             </children>

@@ -3,6 +3,8 @@ package com.metait.java4daisycdcopy;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
+import javafx.concurrent.Worker;
 import javafx.fxml.FXML;
 import javafx.scene.AccessibleRole;
 import javafx.scene.control.*;
@@ -16,7 +18,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
-import java.util.Optional;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -38,6 +40,8 @@ public class Java4DaisyCdCopyController {
     private ListView<String> listView;
     @FXML
     private Button buttonCopy;
+    @FXML
+    private Button buttonCancel;
 
     private Stage mainStage;
     private DirectoryChooser readChooser = new DirectoryChooser();
@@ -47,8 +51,17 @@ public class Java4DaisyCdCopyController {
     private ObservableList<String> listitems = FXCollections.observableArrayList();;
     private MakeSound makeSound = null;
     private int iFilecopied = 0;
+    private Alert alert = new Alert(Alert.AlertType.INFORMATION);
+    private Task<Void> task = null;
+    private File writeNewDir;
+
     @FXML
     public void initialize() {
+
+        buttonCancel.setDisable(true);
+        makeSound = new MakeSound();
+        alert.setTitle("Please Wait...");
+        alert.setHeaderText("The application is copying now. Wait...");
 
         readChooser.setTitle("Set read directory when copying");
         writeChooser.setTitle("Set write directory when copying");
@@ -86,6 +99,7 @@ public class Java4DaisyCdCopyController {
         // buttonCopy.setAccessibleRoleDescription(buttonCopy.getText());
 
         listView.setItems(listitems);
+
         labelMsg.setAccessibleText("Message of the application");
         labelMsg.setAccessibleRole(AccessibleRole.TEXT);
         labelMsg.setFocusTraversable(true);
@@ -118,6 +132,17 @@ public class Java4DaisyCdCopyController {
         File file = readChooser.showDialog(mainStage);
         if (file != null) {
             textFieldReadDir.setText(file.getAbsolutePath());
+            textFieldWriteDir.setText(file.getAbsolutePath());
+            if (file.isDirectory())
+            {
+                readChooser.setInitialDirectory(file);
+            }
+            else {
+                File fPath = file.getParentFile();
+                if (fPath != null && fPath.isDirectory()) {
+                    readChooser.setInitialDirectory(fPath);
+                }
+            }
         }
     }
     @FXML
@@ -126,14 +151,37 @@ public class Java4DaisyCdCopyController {
         File file = writeChooser.showDialog(mainStage);
         if (file != null) {
             textFieldWriteDir.setText(file.getAbsolutePath());
+            if (file.isDirectory())
+            {
+                writeChooser.setInitialDirectory(file);
+            }
+            else {
+                File fPath = file.getParentFile();
+                if (fPath != null && fPath.isDirectory()) {
+                    writeChooser.setInitialDirectory(fPath);
+                }
+            }
         }
     }
 
     @FXML
+    protected void pressedButtonCancel()
+    {
+        if (task != null && task.getState() == Worker.State.READY)
+        {
+            task.cancel(true);
+            buttonCancel.setDisable(true);
+            buttonCopy.setDisable(false);
+        }
+    }
+    @FXML
     protected void pressedButtonCopy() {
 
-        makeSound = null;
         setLabelMsg("Copy started...");
+        listView.getItems().clear();
+        listitems.clear();
+        listView.setItems(listitems);
+
         if (textFieldReadDir.getText().trim().length()==0)
         {
             setLabelMsg("Read directory text field is empty!");
@@ -260,16 +308,37 @@ public class Java4DaisyCdCopyController {
                         return;
                     }
                 }
-                makeSound = new MakeSound();
-                makeSound.playSound(Java4DaisyCdCopyApplication.class.getResource("mistle_w.wav").toString());
-                Thread.sleep(1000);
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setTitle("Please Wait...");
-                alert.setHeaderText("The applicatioin is copying now. Wait...");
-                alert.show();
+                /*
+                Platform.runLater(new Runnable() {
+                    public void run() {
+                 */
+                        // alert.show();
+                        makeSound.playSound(Java4DaisyCdCopyApplication.class.getResource("mistle_w.wav").toString());
+                        try {
+                            Thread.sleep(1000);
+                        } catch (Exception e) {
+                        }
+/*                    }
+                });
+                         */
+                /*
+                setLabelMsg("Started copy...");
+                Platform.runLater(new Runnable() {
+                    public void run() {
+                        // labelMsg.setAccessibleText(msg);
+                        alert.setTitle("Please Wait...");
+                        alert.setHeaderText("The application is copying now. Wait...");
+                        alert.show();
+                    }
+                });
+                 */
                 copyDirContent(readDir, writeDir, strTitle, strCreator, false);
                 makeSound.stop();
-                alert.close();
+                try {
+                    Thread.sleep(1000);
+                }catch (Exception e){
+                }
+                // alert.close();
             } catch (Exception e) {
                 e.printStackTrace();
                 if (makeSound != null)
@@ -285,7 +354,6 @@ public class Java4DaisyCdCopyController {
         String strCreator = "";
         String strContent = "";
         BufferedReader br = null;
-        makeSound = null;
         try {
             startPlayWaw();
             br = new BufferedReader(new FileReader(nccFile, StandardCharsets.UTF_8));
@@ -321,16 +389,24 @@ public class Java4DaisyCdCopyController {
                                     if (strCreator.trim().length()==0)
                                         strCreator = new String("");
                                     boolean isDaisyCopy = true;
-                                    makeSound = new MakeSound();
-                                    makeSound.playSound(Java4DaisyCdCopyApplication.class.getResource("mistle_w.wav").toString());
-                                    Thread.sleep(1000);
-                                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                                    alert.setTitle("Please Wait...");
-                                    alert.setHeaderText("The applicatioin is copying now. Wait...");
-                                    alert.show();
+                                    // Thread.sleep(1000);
+                                    /*
+                                    Platform.runLater(new Runnable() {
+                                        public void run() {
+                                     */
+                                            // alert.show();
+                                            makeSound.playSound(Java4DaisyCdCopyApplication.class.getResource("mistle_w.wav").toString());
+                        try {
+                            Thread.sleep(1000);
+                        } catch (Exception e) {
+                        }
+/*                                        }
+                                    });
+                         */
+
                                     copyDirContent(readDir, writeDir, strTitle, strCreator, isDaisyCopy);
                                     makeSound.stop();
-                                    alert.close();
+                                    // alert.close();
                                 }
                             }
                         }
@@ -361,6 +437,48 @@ public class Java4DaisyCdCopyController {
     {
 
     }
+
+    private String getCorrectDirName(String strDir, boolean bYesBackSlash)
+    {
+        String strNewDir = new String(strDir);
+        if (strNewDir.contains("?"))
+            strNewDir = strNewDir.replaceAll("\\?", "").toString();
+        if (strNewDir.contains("<"))
+            strNewDir = strNewDir.replaceAll("\\<", "").toString();
+        if (strNewDir.contains(">"))
+            strNewDir = strNewDir.replaceAll("\\>", "").toString();
+        if (!bYesBackSlash && strNewDir.contains(":"))
+            strNewDir = strNewDir.replaceAll("\\:", " ").toString();
+        if (!bYesBackSlash && strNewDir.contains("/"))
+            strNewDir = strNewDir.replaceAll("\\/", " ").toString();
+        if (!bYesBackSlash && strNewDir.contains("\\"))
+            strNewDir = strNewDir.replaceAll("\\\\", " ").toString();
+        if (strNewDir.contains("|"))
+            strNewDir = strNewDir.replaceAll("\\|", " ").toString();
+        if (strNewDir.contains("*"))
+            strNewDir = strNewDir.replaceAll("\\*", " ").toString();
+        if (File.separatorChar == '\\') // windows:
+        {
+            for(int i = 0; i < 32; i++)
+            {
+                char c = (char)i;
+                if (strNewDir.contains(Character.toString(c)))
+                {
+                    strNewDir = strNewDir.replaceAll(Character.toString(c), "");
+                }
+            }
+        }
+        else // linux
+        {
+            char c = (char)0;
+            if (strNewDir.contains(Character.toString(c)))
+            {
+                strNewDir = strNewDir.replaceAll(Character.toString(c), "");
+            }
+        }
+        return strNewDir;
+    }
+
     private void copyDirContent(File readDir, File writeDir, String strTitle, String strCreator, boolean isDaisyCoopy)
             throws Exception
     {
@@ -383,8 +501,19 @@ public class Java4DaisyCdCopyController {
                 strDirName = strCreator + ", " + strTitle;
         }
 
-        File writeNewDir = new File(writeDir.getAbsolutePath()
-                +File.separatorChar +strDirName);
+        String strNewDir = writeDir.getAbsolutePath()
+                +File.separatorChar +getCorrectDirName(strDirName, false);
+        boolean bYesBackSlash = true;
+        strNewDir = getCorrectDirName(strNewDir, bYesBackSlash);
+        /*
+        if (strNewDir.contains(" "))
+            strNewDir = "" + '"' + strNewDir +'"';
+         */
+        writeNewDir = new File(strNewDir);
+        if (writeNewDir.canWrite())
+        {
+            throw new Exception("Write lock is maybe on. Cannot write a new dir!");
+        }
         if (writeNewDir.exists())
         {
             String strAfile = "Directory";
@@ -398,33 +527,72 @@ public class Java4DaisyCdCopyController {
             setLabelMsg("Cannot create dir: " +writeNewDir.getName() +" in dir: " +writeDir.getAbsolutePath());
             return;
         }
-        listitems.clear();
-        iFilecopied = 0;
-        File [] files = null;
-        try {
-            files = readDir.listFiles();
-            for(File f : files)
-            {
-                if (f.getName().equals("desktop.ini") && isDaisyCoopy)
-                    continue; // skip this file
-                copyFileIntoTargetDir(f, writeNewDir);
-                /*
-                Platform.runLater(new Runnable() {
-                    @Override
-                    public void run() {
-                 */
-                    if (f.isDirectory())
-                        listitems.add("DIR: " +f.getName());
-                    else
-                        listitems.add(f.getName());
-                //    }});
+
+        Platform.runLater(new Runnable() {
+            public void run() {
+                buttonCancel.setDisable(false);
+                buttonCopy.setDisable(true);
             }
-            setLabelMsg("All files (" +iFilecopied +") have been copied into dir: " +writeNewDir.getAbsolutePath());
-        }catch (Exception e){
-            e.printStackTrace();
-            setLabelMsg("Error in the directory writing: " +e.getMessage());
-            throw e;
-        }
+        });
+
+//Task for computing the Panels:
+        task = new Task<Void>() {
+            @Override
+            protected Void call() throws Exception {
+                File[] files = null;
+                try {
+                    files = readDir.listFiles();
+                    for (File f : files) {
+                        if (f.getName().equals("desktop.ini") && isDaisyCoopy)
+                            continue; // skip this file
+                        copyFileIntoTargetDir(f, writeNewDir);
+                /*
+                try {
+                    Thread.sleep(2000);
+                }catch (Exception e){
+                }
+                 */
+                        Platform.runLater(new Runnable() {
+                            public void run() {
+                                if (f.isDirectory())
+                                    listitems.add("DIR: " + f.getName());
+                                else
+                                    listitems.add(f.getName());
+                            }
+                        });
+                    }
+                    makeSound.stop();
+                    try {
+                        Thread.sleep(1000);
+                    }catch (Exception e){
+                    }
+                    setLabelMsg("All files (" + iFilecopied + ") have been copied into dir: " + writeNewDir.getAbsolutePath());
+                    Platform.runLater(new Runnable() {
+                        public void run() {
+                            buttonCancel.setDisable(true);
+                            buttonCopy.setDisable(false);
+                        }
+                    });
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    makeSound.stop();
+                    try {
+                        Thread.sleep(1000);
+                    }catch (Exception e2){
+                    }
+                    setLabelMsg("Error in the directory writing: " + e.getMessage());
+                    task.cancel(true);
+                    Platform.runLater(new Runnable() {
+                        public void run() {
+                            buttonCancel.setDisable(true);
+                            buttonCopy.setDisable(false);
+                        }
+                    });
+                    throw e;
+                }
+                return null;
+             }};
+        new Thread(task).start();
     }
 
     private void copyFileIntoTargetDir(File fSource, File ftargetDir)
@@ -445,10 +613,14 @@ public class Java4DaisyCdCopyController {
             for (File f : subFiles)
             {
                 copyFileIntoTargetDir(f, newTargetFile);
-                if (f.isDirectory())
-                    listitems.add("DIR: " +f.getAbsolutePath());
-                else
-                    listitems.add(f.getAbsolutePath());
+                Platform.runLater(new Runnable() {
+                    public void run() {
+                        if (f.isDirectory())
+                            listitems.add("DIR: " + f.getName());
+                        else
+                            listitems.add(f.getName());
+                    }
+                });
             }
         }
     }
